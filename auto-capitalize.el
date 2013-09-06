@@ -9,6 +9,7 @@
 ;; Package-Version: 2.20
 ;; Keywords: text, wp, convenience
 ;; RCS $Id: auto-capitalize.el,v 2.20 2005/05/25 18:47:22 kevinr Exp $
+;; URL: https://github.com/yuutayamada/auto-capitalize-el.git
 
 ;; This program is free software; you can redistribute it and/or
 ;; modify it under the terms of the GNU General Public License as
@@ -387,3 +388,6 @@ This should be installed as an `after-change-function'."
 
 ;; 30 Nov 2010: @Rikal: Are you ending sentences as required (e.g.: with two spaces)? Check "C-h f sentence-end RET".
 ;; -- elena
+
+;; 6 Sep 2013: Apply SKK package and split functions
+;; -- Yuta
