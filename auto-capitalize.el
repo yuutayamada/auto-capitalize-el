@@ -1,5 +1,5 @@
+;;; -*- coding: utf-8; mode: emacs-lisp; -*-
 ;;; auto-capitalize.el --- Automatically capitalize (or upcase) words
-;;; -*-unibyte: t; coding: iso-8859-1;-*-
 
 ;; Copyright � 1998,2001,2002,2005 Kevin Rodgers
 
