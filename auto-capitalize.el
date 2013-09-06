@@ -228,35 +228,35 @@ Capitalization can be disabled in specific contexts via the
 `auto-capitalize-predicate' variable.
 
 This should be installed as an `after-change-function'."
-  (if (and auto-capitalize
-           (or (null auto-capitalize-predicate)
-               (funcall auto-capitalize-predicate)))
-      (cond ((auto-capitalize-condition beg end length)
-             ;; self-inserting, non-word character
-             (if (and (> beg (point-min))
-                      (equal (char-syntax (char-after (1- beg))) ?w))
-                 (auto-capitalize-capitalize-preceded-word)))
-            ((and auto-capitalize-yank
-                  ;; `yank' sets `this-command' to t, and the
-                  ;; after-change-functions are run before it has been
-                  ;; reset:
-                  (or (eq this-command 'yank)
-                      (and (= length 0) ; insertion?
-                           (eq this-command 't))))
-             (save-excursion
-               (goto-char beg)
-               (save-match-data
-                 (while (re-search-forward "\\Sw" end t)
-                   ;; recursion!
-                   (let* ((this-command 'self-insert-command)
-                          (non-word-char (char-after (match-beginning 0)))
-                          (last-command-event
-                           (cond ((fboundp 'character-to-event) ; XEmacs
-                                  (character-to-event non-word-char))
-                                 (t non-word-char)))) ; GNU Emacs
-                     (auto-capitalize (match-beginning 0)
-                                      (match-end 0)
-                                      0)))))))))
+  (when (and auto-capitalize
+             (or (null auto-capitalize-predicate)
+                 (funcall auto-capitalize-predicate)))
+    (cond ((auto-capitalize-condition beg end length)
+           ;; self-inserting, non-word character
+           (if (and (> beg (point-min))
+                    (equal (char-syntax (char-after (1- beg))) ?w))
+               (auto-capitalize-capitalize-preceded-word)))
+          ((and auto-capitalize-yank
+                ;; `yank' sets `this-command' to t, and the
+                ;; after-change-functions are run before it has been
+                ;; reset:
+                (or (eq this-command 'yank)
+                    (and (= length 0) ; insertion?
+                         (eq this-command 't))))
+           (save-excursion
+             (goto-char beg)
+             (save-match-data
+               (while (re-search-forward "\\Sw" end t)
+                 ;; recursion!
+                 (let* ((this-command 'self-insert-command)
+                        (non-word-char (char-after (match-beginning 0)))
+                        (last-command-event
+                         (cond ((fboundp 'character-to-event) ; XEmacs
+                                (character-to-event non-word-char))
+                               (t non-word-char)))) ; GNU Emacs
+                   (auto-capitalize (match-beginning 0)
+                                    (match-end 0)
+                                    0)))))))))
 
 (defun auto-capitalize-user-specified (lowercase-word match-beg match-end)
   "Capitalize user-specified capitalization"
