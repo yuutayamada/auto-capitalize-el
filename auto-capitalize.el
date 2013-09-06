@@ -258,72 +258,8 @@ This should be installed as an `after-change-function'."
                                               "\\)\\>"))))
                               (auto-capitalize-user-specified
                                lowercase-word (match-beginning 1) (match-end 1)))
-                             ((and (or (equal text-start (point-min)) ; (bobp)
-                                       (progn ; beginning of paragraph?
-                                         (goto-char text-start)
-                                         (and (= (current-column) left-margin)
-                                              (zerop (forward-line -1))
-                                              (looking-at paragraph-separate)))
-                                       (progn ; beginning of paragraph?
-                                         (goto-char text-start)
-                                         (and (= (current-column) left-margin)
-                                              (re-search-backward paragraph-start
-                                                                  nil t)
-                                              (= (match-end 0) text-start)
-                                              (= (current-column) left-margin)))
-                                       (progn ; beginning of sentence?
-                                         (goto-char text-start)
-                                         (save-restriction
-                                           (narrow-to-region (point-min)
-                                                             word-start)
-                                           (and (re-search-backward (auto-capitalize-sentence-end)
-                                                                    nil t)
-                                                (= (match-end 0) text-start)
-                                                ;; verify: preceded by
-                                                ;; whitespace?
-                                                (let ((previous-char
-                                                       (char-after
-                                                        (1- text-start))))
-                                                  ;; In some modes, newline
-                                                  ;; (^J, aka LFD) is comment-
-                                                  ;; end, not whitespace:
-                                                  (or (equal previous-char
-                                                             ?\n)
-                                                      (equal (char-syntax
-                                                              previous-char)
-                                                             ? )))
-                                                ;; verify: not preceded by
-                                                ;; an abbreviation?
-                                                (let ((case-fold-search nil)
-                                                      (abbrev-regexp
-                                                       (if (featurep 'xemacs)
-                                                           "\\<\\([A-Z�-��-�]?[a-z�-��-�]+\\.\\)+\\="
-                                                         "\\<\\([[:upper:]]?[[:lower:]]+\\.\\)+\\=")))
-                                                  (goto-char
-                                                   (1+ (match-beginning 0)))
-                                                  (or (not
-                                                       (re-search-backward abbrev-regexp
-                                                                           nil t))
-                                                      (not
-                                                       (member
-                                                        (buffer-substring ; -no-properties?
-                                                         (match-beginning 0)
-                                                         (match-end 0))
-                                                        auto-capitalize-words))))
-                                                ))))
-                                   ;; inserting lowercase text?
-                                   (let ((case-fold-search nil))
-                                     (goto-char word-start)
-                                     (looking-at (if (featurep 'xemacs)
-                                                     "[a-z�-��-�]+"
-                                                   "[[:lower:]]+")))
-                                   (or (eq auto-capitalize t)
-                                       (prog1 (y-or-n-p
-                                               (format "Capitalize \"%s\"? "
-                                                       (buffer-substring
-                                                        (match-beginning 0)
-                                                        (match-end 0))))
-                                         (message ""))))
+                             ((auto-capitalize-capitalizable-p
+                               text-start word-start)
                               ;; capitalize!
                               (undo-boundary)
                               (goto-char word-start)
@@ -365,6 +301,74 @@ This should be installed as an `after-change-function'."
                                 :key 'downcase
                                 :test 'string-equal)
                        t t))))
+
+(defun auto-capitalize-capitalizable-p (text-start word-start)
+  (and (or (equal text-start (point-min)) ; (bobp)
+           (progn ; beginning of paragraph?
+             (goto-char text-start)
+             (and (= (current-column) left-margin)
+                  (zerop (forward-line -1))
+                  (looking-at paragraph-separate)))
+           (progn ; beginning of paragraph?
+             (goto-char text-start)
+             (and (= (current-column) left-margin)
+                  (re-search-backward paragraph-start
+                                      nil t)
+                  (= (match-end 0) text-start)
+                  (= (current-column) left-margin)))
+           (progn ; beginning of sentence?
+             (goto-char text-start)
+             (save-restriction
+               (narrow-to-region (point-min)
+                                 word-start)
+               (and (re-search-backward (auto-capitalize-sentence-end)
+                                        nil t)
+                    (= (match-end 0) text-start)
+                    ;; verify: preceded by
+                    ;; whitespace?
+                    (let ((previous-char
+                           (char-after
+                            (1- text-start))))
+                      ;; In some modes, newline
+                      ;; (^J, aka LFD) is comment-
+                      ;; end, not whitespace:
+                      (or (equal previous-char
+                                 ?\n)
+                          (equal (char-syntax
+                                  previous-char)
+                                 ? )))
+                    ;; verify: not preceded by
+                    ;; an abbreviation?
+                    (let ((case-fold-search nil)
+                          (abbrev-regexp
+                           (if (featurep 'xemacs)
+                               "\\<\\([A-Z�-��-�]?[a-z�-��-�]+\\.\\)+\\="
+                             "\\<\\([[:upper:]]?[[:lower:]]+\\.\\)+\\=")))
+                      (goto-char
+                       (1+ (match-beginning 0)))
+                      (or (not
+                           (re-search-backward abbrev-regexp
+                                               nil t))
+                          (not
+                           (member
+                            (buffer-substring ; -no-properties?
+                             (match-beginning 0)
+                             (match-end 0))
+                            auto-capitalize-words))))
+                    ))))
+       ;; inserting lowercase text?
+       (let ((case-fold-search nil))
+         (goto-char word-start)
+         (looking-at (if (featurep 'xemacs)
+                         "[a-z�-��-�]+"
+                       "[[:lower:]]+")))
+       (or (eq auto-capitalize t)
+           (prog1 (y-or-n-p
+                   (format "Capitalize \"%s\"? "
+                           (buffer-substring
+                            (match-beginning 0)
+                            (match-end 0))))
+             (message "")))))
 
 ;;; auto-capitalize.el ends here
 
