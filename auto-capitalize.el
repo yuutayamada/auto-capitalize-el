@@ -96,8 +96,7 @@
 
 (provide 'auto-capitalize)
 
-(require 'cl)				; find, minusp
-
+(require 'cl-lib) ; find, minusp
 
 ;; User options:
 
@@ -240,8 +239,8 @@ This should be installed as an `after-change-function'."
 		     (let* ((word-start (point))
 			    (text-start
 			     (progn
-			       (while (or (minusp (skip-chars-backward "\""))
-					  (minusp (skip-syntax-backward "\"(")))
+			       (while (or (cl-minusp (skip-chars-backward "\""))
+					  (cl-minusp (skip-syntax-backward "\"(")))
 				 t)
 			       (point)))
 			    lowercase-word)
@@ -263,7 +262,7 @@ This should be installed as an `after-change-function'."
 				  ;; not preserving lower case
 				  (progn ; capitalize!
 				    (undo-boundary)
-				    (replace-match (find lowercase-word
+				    (replace-match (cl-find lowercase-word
 							 auto-capitalize-words
 							 :key 'downcase
 							 :test 'string-equal)
