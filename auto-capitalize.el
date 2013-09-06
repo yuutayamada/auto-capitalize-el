@@ -187,6 +187,33 @@ Fix known to work on 23.0.90 and later"
       (sentence-end)
     sentence-end))
 
+(defun auto-capitalize-condition (beg end length)
+  (or (and (or (eq this-command 'self-insert-command)
+               ;; LaTeX mode binds "." to TeX-insert-punctuation,
+               ;; and "\"" to TeX-insert-quote:
+               (let ((key (this-command-keys)))
+                 ;; XEmacs `lookup-key' signals "unable to bind
+                 ;; this type of event" for commands invoked via
+                 ;; the mouse:
+                 (and (if (and (vectorp key)
+                               (> (length key) 0)
+                               (fboundp 'misc-user-event-p)
+                               (misc-user-event-p (aref key 0)))
+                          nil
+                        (eq (lookup-key global-map key t)
+                            'self-insert-command))
+                      ;; single character insertion?
+                      (= length 0)
+                      (= (- end beg) 1))))
+           (let ((self-insert-char
+                  (cond ((fboundp 'event-to-character) ; XEmacs
+                         (event-to-character last-command-event
+                                             nil nil t))
+                        (t last-command-event)))) ; GNU Emacs
+             (not (equal (char-syntax self-insert-char) ?w))))
+      (eq this-command 'newline)
+      (eq this-command 'newline-and-indent)))
+
 (defun auto-capitalize (beg end length)
   "If `auto-capitalize' mode is on, then capitalize the previous word.
 The previous word is capitalized (or upcased) if it is a member of the
@@ -204,31 +231,7 @@ This should be installed as an `after-change-function'."
   (if (and auto-capitalize
            (or (null auto-capitalize-predicate)
                (funcall auto-capitalize-predicate)))
-      (cond ((or (and (or (eq this-command 'self-insert-command)
-                          ;; LaTeX mode binds "." to TeX-insert-punctuation,
-                          ;; and "\"" to TeX-insert-quote:
-                          (let ((key (this-command-keys)))
-                            ;; XEmacs `lookup-key' signals "unable to bind
-                            ;; this type of event" for commands invoked via
-                            ;; the mouse:
-                            (and (if (and (vectorp key)
-                                          (> (length key) 0)
-                                          (fboundp 'misc-user-event-p)
-                                          (misc-user-event-p (aref key 0)))
-                                     nil
-                                   (eq (lookup-key global-map key t)
-                                       'self-insert-command))
-                                 ;; single character insertion?
-                                 (= length 0)
-                                 (= (- end beg) 1))))
-                      (let ((self-insert-char
-                             (cond ((fboundp 'event-to-character) ; XEmacs
-                                    (event-to-character last-command-event
-                                                        nil nil t))
-                                   (t last-command-event)))) ; GNU Emacs
-                        (not (equal (char-syntax self-insert-char) ?w))))
-                 (eq this-command 'newline)
-                 (eq this-command 'newline-and-indent))
+      (cond ((auto-capitalize-condition beg end length)
              ;; self-inserting, non-word character
              (if (and (> beg (point-min))
                       (equal (char-syntax (char-after (1- beg))) ?w))
