@@ -256,20 +256,8 @@ This should be installed as an `after-change-function'."
                                                          auto-capitalize-words
                                                          "\\|")
                                               "\\)\\>"))))
-                              ;; user-specified capitalization
-                              (if (not (member (setq lowercase-word
-                                                     (buffer-substring ; -no-properties?
-                                                      (match-beginning 1)
-                                                      (match-end 1)))
-                                               auto-capitalize-words))
-                                  ;; not preserving lower case
-                                  (progn ; capitalize!
-                                    (undo-boundary)
-                                    (replace-match (cl-find lowercase-word
-                                                            auto-capitalize-words
-                                                            :key 'downcase
-                                                            :test 'string-equal)
-                                                   t t))))
+                              (auto-capitalize-user-specified
+                               lowercase-word (match-beginning 1) (match-end 1)))
                              ((and (or (equal text-start (point-min)) ; (bobp)
                                        (progn ; beginning of paragraph?
                                          (goto-char text-start)
@@ -361,6 +349,22 @@ This should be installed as an `after-change-function'."
                      (auto-capitalize (match-beginning 0)
                                       (match-end 0)
                                       0)))))))))
+
+(defun auto-capitalize-user-specified (lowercase-word match-beg match-end)
+  "Capitalize user-specified capitalization"
+  (if (not (member (setq lowercase-word
+                         (buffer-substring ; -no-properties?
+                          (match-beginning 1)
+                          (match-end 1)))
+                   auto-capitalize-words))
+      ;; not preserving lower case
+      (progn ; capitalize!
+        (undo-boundary)
+        (replace-match (cl-find lowercase-word
+                                auto-capitalize-words
+                                :key 'downcase
+                                :test 'string-equal)
+                       t t))))
 
 ;;; auto-capitalize.el ends here
 
