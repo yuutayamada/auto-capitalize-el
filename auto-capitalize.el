@@ -235,35 +235,7 @@ This should be installed as an `after-change-function'."
              ;; self-inserting, non-word character
              (if (and (> beg (point-min))
                       (equal (char-syntax (char-after (1- beg))) ?w))
-                 ;; preceded by a word character
-                 (save-excursion
-                   (forward-word -1)
-                   (save-match-data
-                     (let* ((word-start (point))
-                            (text-start
-                             (progn
-                               (while (or (cl-minusp (skip-chars-backward "\""))
-                                          (cl-minusp (skip-syntax-backward "\"(")))
-                                 t)
-                               (point)))
-                            lowercase-word)
-                       (cond ((and auto-capitalize-words
-                                   (let ((case-fold-search nil))
-                                     (goto-char word-start)
-                                     (looking-at
-                                      (concat "\\("
-                                              (mapconcat 'downcase
-                                                         auto-capitalize-words
-                                                         "\\|")
-                                              "\\)\\>"))))
-                              (auto-capitalize-user-specified
-                               lowercase-word (match-beginning 1) (match-end 1)))
-                             ((auto-capitalize-capitalizable-p
-                               text-start word-start)
-                              ;; capitalize!
-                              (undo-boundary)
-                              (goto-char word-start)
-                              (capitalize-word 1))))))))
+                 (auto-capitalize-capitalize-preceded-word)))
             ((and auto-capitalize-yank
                   ;; `yank' sets `this-command' to t, and the
                   ;; after-change-functions are run before it has been
@@ -369,6 +341,37 @@ This should be installed as an `after-change-function'."
                             (match-beginning 0)
                             (match-end 0))))
              (message "")))))
+
+(defun auto-capitalize-capitalize-preceded-word ()
+  "Capitalize preceded by a word character"
+  (save-excursion
+    (forward-word -1)
+    (save-match-data
+      (let* ((word-start (point))
+             (text-start
+              (progn
+                (while (or (cl-minusp (skip-chars-backward "\""))
+                           (cl-minusp (skip-syntax-backward "\"(")))
+                  t)
+                (point)))
+             lowercase-word)
+        (cond ((and auto-capitalize-words
+                    (let ((case-fold-search nil))
+                      (goto-char word-start)
+                      (looking-at
+                       (concat "\\("
+                               (mapconcat 'downcase
+                                          auto-capitalize-words
+                                          "\\|")
+                               "\\)\\>"))))
+               (auto-capitalize-user-specified
+                lowercase-word (match-beginning 1) (match-end 1)))
+              ((auto-capitalize-capitalizable-p
+                text-start word-start)
+               ;; capitalize!
+               (undo-boundary)
+               (goto-char word-start)
+               (capitalize-word 1)))))))
 
 ;;; auto-capitalize.el ends here
 
