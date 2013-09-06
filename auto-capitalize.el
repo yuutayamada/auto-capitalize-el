@@ -309,7 +309,6 @@ This should be installed as an `after-change-function'."
                                                 (let ((case-fold-search nil)
                                                       (abbrev-regexp
                                                        (if (featurep 'xemacs)
-                                                           ;; iso-8859-5, �-��-� �-��-�
                                                            "\\<\\([A-Z�-��-�]?[a-z�-��-�]+\\.\\)+\\="
                                                          "\\<\\([[:upper:]]?[[:lower:]]+\\.\\)+\\=")))
                                                   (goto-char
