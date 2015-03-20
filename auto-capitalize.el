@@ -147,6 +147,7 @@ non-nil value if the current word is within \"normal\" text.")
 
 ;; Commands:
 
+;;;###autoload
 (defun auto-capitalize-mode (&optional arg)
   "Toggle `auto-capitalize' minor mode in this buffer.
 With optional prefix ARG, turn `auto-capitalize' mode on iff ARG is positive.
@@ -159,18 +160,21 @@ This sets `auto-capitalize' to t or nil (for this buffer) and ensures that
           (> (prefix-numeric-value arg) 0)))
   (add-hook 'after-change-functions 'auto-capitalize nil t))
 
+;;;###autoload
 (defun turn-on-auto-capitalize-mode ()
   "Turn on `auto-capitalize' mode in this buffer.
 This sets `auto-capitalize' to t."
   (interactive)
   (auto-capitalize-mode 1))
 
+;;;###autoload
 (defun turn-off-auto-capitalize-mode ()
   "Turn off `auto-capitalize' mode in this buffer.
 This sets `auto-capitalize' to nil."
   (interactive)
   (auto-capitalize-mode -1))
 
+;;;###autoload
 (defun enable-auto-capitalize-mode ()
   "Enable `auto-capitalize' mode in this buffer.
 This sets `auto-capitalize' to `query'."
