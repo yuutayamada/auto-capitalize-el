@@ -146,17 +146,20 @@ non-nil value if the current word is within \"normal\" text.")
 ;; Commands:
 
 ;;;###autoload
-(defun auto-capitalize-mode (&optional arg)
+(easy-mmode-define-minor-mode auto-capitalize-mode
   "Toggle `auto-capitalize' minor mode in this buffer.
 With optional prefix ARG, turn `auto-capitalize' mode on iff ARG is positive.
 This sets `auto-capitalize' to t or nil (for this buffer) and ensures that
 `auto-capitalize' is installed in `after-change-functions' (for all buffers)."
-  (interactive "P")
-  (setq auto-capitalize
-        (if (null arg)
-            (not auto-capitalize)
-          (> (prefix-numeric-value arg) 0)))
-  (add-hook 'after-change-functions 'auto-capitalize nil t))
+  nil " C" nil
+  (if (or (not auto-capitalize-mode) buffer-read-only)
+      ;; Turn off
+      (progn (setq-local auto-capitalize nil)
+             (remove-hook 'after-change-functions 'auto-capitalize t))
+    ;; Turn on
+    (when (not buffer-read-only)
+      (setq-local auto-capitalize t)
+      (add-hook 'after-change-functions 'auto-capitalize nil t))))
 
 ;;;###autoload
 (defun turn-on-auto-capitalize-mode ()
