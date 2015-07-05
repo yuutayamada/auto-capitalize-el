@@ -101,14 +101,12 @@
 
 ;; User options:
 
-(defvar auto-capitalize nil
+(defvar-local auto-capitalize nil
   "If non-nil, the first word of a sentence is automatically capitalized.
 If non-nil but not t, query the user before capitalizing a word.
 This variable automatically becomes buffer-local when set in any fashion\;
 see `\\[auto-capitalize-mode]', `\\[turn-on-capitalize-mode]', or
 `\\[enable-auto-capitalize-mode]'.")
-
-(make-variable-buffer-local 'auto-capitalize)
 
 (put 'auto-capitalize 'variable-interactive
      "XAutomatically capitalize the first word of each sentence? (t, nil, or 'query): ")
