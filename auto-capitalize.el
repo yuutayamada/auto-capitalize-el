@@ -174,6 +174,11 @@ return nil if it’s failure.")
        (not (derived-mode-p 'comint-mode))
        ;; For user hook
        (run-hook-with-args-until-failure auto-capitalize-predicate-functions)
+       ;; For specific major-mode
+       (let ((fname (intern (format "auto-capitalize-predicate-%s" major-mode))))
+         (if (fboundp fname)
+             (funcall fname)
+           t))))
 
 ;;;###autoload
 (easy-mmode-define-minor-mode auto-capitalize-mode
@@ -415,6 +420,12 @@ This should be installed as an `after-change-function'."
                (goto-char word-start)
                (capitalize-word 1)))))))
 
+;; Org mode
+(with-eval-after-load "org"
+  (defun auto-capitalize-predicate-org-mode ()
+    (if (not (eq major-mode 'org-mode))
+        t
+      (not (and (fboundp 'org-in-src-block-p) (org-in-src-block-p))))))
 
 ;; SKK (ddskk)
 (with-eval-after-load "skk"
