@@ -97,6 +97,8 @@
 ;;   * Added some package specific predicates.
 ;; 3 fixed some warnings.
 ;; 4 use of lexical-biding.
+;; 5 use capitalized words of aspell’s dictionary
+;;   (see ‘auto-capitalize-aspell-file’)
 ;;
 ;;; Code:
 
@@ -164,6 +166,10 @@ If you set nil, then don't restrict by this variable.")
   "This hook is used to call predicate function.
 The function should return t if the predicate is ok or
 return nil if it's failure.")
+
+(defvar auto-capitalize-aspell-file nil
+  "You can set a file path of aspell to use capitalized words of aspell.
+The file name would be something like .aspell.en.pws.")
 
 ;; Internal variables:
 
@@ -436,6 +442,39 @@ This should be installed as an `after-change-function'."
                (undo-boundary)
                (goto-char word-start)
                (capitalize-word 1)))))))
+
+(defun auto-capitalize--get-buffer-string (file)
+  (let* ((current        (current-buffer))
+         (aspell-buffer  (find-file-noselect file))
+         words)
+    (switch-to-buffer aspell-buffer)
+    (setq words (buffer-substring-no-properties (point-min) (point-max)))
+    (switch-to-buffer current)
+    words))
+
+(defun auto-capitalize--get-aspell-capital-words (file)
+  ""
+  (if (file-exists-p file)
+      (cl-loop with personal-dict = (auto-capitalize--get-buffer-string file)
+               with words = (split-string personal-dict "\n")
+               with case-fold-search = nil
+               for word in words
+               if (string-match "[A-Z]" word)
+               collect word)
+    (error (format "The file %s doesn't exist" file))))
+
+(defun auto-capitalize-merge-aspell-words (&optional file)
+  (let ((f (or auto-capitalize-aspell-file file)))
+    (when (file-exists-p f)
+      (setq auto-capitalize-words
+            (append auto-capitalize-words
+                    (auto-capitalize--get-aspell-capital-words f))))))
+
+;;;###autoload
+(defun auto-capitalize-setup ()
+  ""
+  (auto-capitalize-merge-aspell-words)
+  (add-hook 'after-change-major-mode-hook 'auto-capitalize-mode))
 
 ;; Org mode
 (with-eval-after-load "org"
