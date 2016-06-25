@@ -143,6 +143,11 @@ If you set nil, then don’t restrict by this variable.")
 (defvar auto-capitalize-inhibit-buffers '("*scratch*")
   "Inhibit auto capitalize mode in those buffer.")
 
+(defvar auto-capitalize-predicate-functions nil
+  "This hook is used to call predicate function.
+The function should return t if the predicate is ok or
+return nil if it’s failure.")
+
 ;; Internal variables:
 
 (defconst auto-capitalize-version "$Revision: 2.20 $"
@@ -167,11 +172,8 @@ If you set nil, then don’t restrict by this variable.")
            (member last-command-event auto-capitalize-allowed-chars))
        ;; don’t turn on like inferior-XXX-mode
        (not (derived-mode-p 'comint-mode))
-       ;; SKK (ddskk)
-       (or (not (bound-and-true-p skk-mode))
-           (and (bound-and-true-p skk-mode)
-                (fboundp 'skk-current-input-mode)
-                (eq 'latin (skk-current-input-mode))))))
+       ;; For user hook
+       (run-hook-with-args-until-failure auto-capitalize-predicate-functions)
 
 ;;;###autoload
 (easy-mmode-define-minor-mode auto-capitalize-mode
@@ -412,6 +414,17 @@ This should be installed as an `after-change-function'."
                (undo-boundary)
                (goto-char word-start)
                (capitalize-word 1)))))))
+
+
+;; SKK (ddskk)
+(with-eval-after-load "skk"
+  (add-to-list
+   'auto-capitalize-predicate-functions
+   (lambda ()
+     (or (not (bound-and-true-p skk-mode))
+         (and (bound-and-true-p skk-mode)
+              (fboundp 'skk-current-input-mode)
+              (eq 'latin (skk-current-input-mode)))))))
 
 ;; 1 Jun 2009: It does not work with Aquamacs 1.7/GNUEmacs 22. Only the first word in the buffer
 ;; (or the first word typed after mode activation) is capitalized.
