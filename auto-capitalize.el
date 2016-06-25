@@ -1,9 +1,10 @@
-;;; -*- coding: utf-8; mode: emacs-lisp; -*-
 ;;; auto-capitalize.el --- Automatically capitalize (or upcase) words
 
 ;; Copyright � 1998,2001,2002,2005 Kevin Rodgers
 
-;; Author: Kevin Rodgers <ihs_4664@yahoo.com>
+;; Original Author: Kevin Rodgers <ihs_4664@yahoo.com>
+;; Maintainer: Yuta Yamada <cokesboy at gmail.com>
+
 ;; Created: 20 May 1998
 ;; Version: $Revision: 2.20 $
 ;; Package-Version: 2.20
@@ -95,9 +96,7 @@
 
 ;; Package interface:
 
-(provide 'auto-capitalize)
-
-(require 'cl-lib) ; find, minusp
+(require 'cl-lib) ; cl-find, cl-minusp
 
 ;; User options:
 
@@ -152,14 +151,13 @@ With optional prefix ARG, turn `auto-capitalize' mode on iff ARG is positive.
 This sets `auto-capitalize' to t or nil (for this buffer) and ensures that
 `auto-capitalize' is installed in `after-change-functions' (for all buffers)."
   nil " C" nil
-  (if (or (not auto-capitalize-mode) buffer-read-only)
-      ;; Turn off
-      (progn (setq-local auto-capitalize nil)
-             (remove-hook 'after-change-functions 'auto-capitalize t))
-    ;; Turn on
-    (when (not buffer-read-only)
-      (setq-local auto-capitalize t)
-      (add-hook 'after-change-functions 'auto-capitalize nil t))))
+  (cond
+   ((or (not auto-capitalize-mode) buffer-read-only)
+    (setq-local auto-capitalize nil)
+    (remove-hook 'after-change-functions 'auto-capitalize t))
+   (t
+    (setq-local auto-capitalize t)
+    (add-hook 'after-change-functions 'auto-capitalize nil t))))
 
 ;;;###autoload
 (defun turn-on-auto-capitalize-mode ()
@@ -383,8 +381,6 @@ This should be installed as an `after-change-function'."
                (goto-char word-start)
                (capitalize-word 1)))))))
 
-;;; auto-capitalize.el ends here
-
 ;; 1 Jun 2009: It does not work with Aquamacs 1.7/GNUEmacs 22. Only the first word in the buffer
 ;; (or the first word typed after mode activation) is capitalized.
 ;; Maybe the code is too old (1998). -- Rikal
@@ -398,3 +394,12 @@ This should be installed as an `after-change-function'."
 
 ;; 6 Sep 2013: Apply SKK package and split functions
 ;; -- Yuta
+
+(provide 'auto-capitalize)
+
+;; Local Variables:
+;; coding: utf-8
+;; mode: emacs-lisp
+;; End:
+
+;;; auto-capitalize.el ends here
