@@ -155,10 +155,12 @@ If you set nil, then don’t restrict by this variable.")
 (defun auto-capitalize-default-predicate-function ()
   "Return t if condition is ok."
   (and (not buffer-read-only)
-       ;; activate if prog and in string or comment.
-       (and (derived-mode-p 'prog-mode)
-            (save-excursion (nth 8 (syntax-ppss))))
-       ;; Inhibit specific buffers
+       ;; activate if prog-mode and cursor is in string or comment.
+       (if (derived-mode-p 'prog-mode)
+           (and (derived-mode-p 'prog-mode)
+                (save-excursion (nth 8 (syntax-ppss))))
+         t)
+       ;; inhibit specific buffers
        (not (member (buffer-name) auto-capitalize-inhibit-buffers))
        ;; activate after only specific characters you type
        (or (null auto-capitalize-allowed-chars)
