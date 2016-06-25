@@ -134,7 +134,8 @@ see `\\[auto-capitalize-mode]', `\\[turn-on-capitalize-mode]', or
 
 (or (assq 'auto-capitalize minor-mode-alist)
     (setq minor-mode-alist
-          (cons (list 'auto-capitalize " Cap") minor-mode-alist)))
+          (cons (list 'auto-capitalize " ACap")
+                minor-mode-alist)))
 
 
 (defvar auto-capitalize-yank nil
@@ -160,7 +161,7 @@ non-nil value if the current word is within \"normal\" text.")
 
 (defvar auto-capitalize-allowed-chars '(?\  ?, ?. ??)
   "Whether auto capitalize after you typed those characters.
-If you set nil, then don’t restrict by this variable.")
+If you set nil, then don't restrict by this variable.")
 
 (defvar auto-capitalize-inhibit-buffers '("*scratch*")
   "Inhibit auto capitalize mode in those buffer.")
@@ -168,7 +169,7 @@ If you set nil, then don’t restrict by this variable.")
 (defvar auto-capitalize-predicate-functions nil
   "This hook is used to call predicate function.
 The function should return t if the predicate is ok or
-return nil if it’s failure.")
+return nil if it's failure.")
 
 ;; Internal variables:
 
@@ -176,6 +177,10 @@ return nil if it’s failure.")
   "This version of auto-capitalize.el")
 
 (defvar auto-capitalize--match-data nil)
+
+(defvar auto-capitalize-regex-lower "[[:lower:]]+")
+(defvar auto-capitalize-regex-verify
+  "\\<\\([[:upper:]]?[[:lower:]]+\\.\\)+\\=")
 
 ;; Commands:
 
@@ -193,7 +198,7 @@ return nil if it’s failure.")
        ;; activate after only specific characters you type
        (or (null auto-capitalize-allowed-chars)
            (member last-command-event auto-capitalize-allowed-chars))
-       ;; don’t turn on like inferior-XXX-mode
+       ;; don't turn on like inferior-XXX-mode
        (not (derived-mode-p 'comint-mode))
        ;; For user hook
        (run-hook-with-args-until-failure auto-capitalize-predicate-functions)
@@ -382,10 +387,7 @@ This should be installed as an `after-change-function'."
                     ;; verify: not preceded by
                     ;; an abbreviation?
                     (let ((case-fold-search nil)
-                          (abbrev-regexp
-                           (if (featurep 'xemacs)
-                               "\\<\\([A-Z�-��-�]?[a-z�-��-�]+\\.\\)+\\="
-                             "\\<\\([[:upper:]]?[[:lower:]]+\\.\\)+\\=")))
+                          (abbrev-regexp auto-capitalize-regex-verify))
                       (goto-char
                        (1+ (match-beginning 0)))
                       (or (not
@@ -401,9 +403,7 @@ This should be installed as an `after-change-function'."
        ;; inserting lowercase text?
        (let ((case-fold-search nil))
          (goto-char word-start)
-         (looking-at (if (featurep 'xemacs)
-                         "[a-z�-��-�]+"
-                       "[[:lower:]]+")))
+         (looking-at auto-capitalize-regex-lower))
        (or (eq auto-capitalize t)
            (prog1 (y-or-n-p
                    (format "Capitalize \"%s\"? "
