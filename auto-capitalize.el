@@ -131,18 +131,43 @@ capitalized or upcased as listed (mixed case is allowable as well), even
 in the middle of a sentence.  A lowercase word will not have its case
 modified.")
 
-(defvar auto-capitalize-predicate nil
+(defvar auto-capitalize-predicate 'auto-capitalize-default-predicate-function
   "If non-nil, a function that determines whether to enable capitalization.
 In auto-capitalize mode, it is called with no arguments and should return a
 non-nil value if the current word is within \"normal\" text.")
+
+(defvar auto-capitalize-allowed-chars '(?\  ?, ?. ??)
+  "Whether auto capitalize after you typed those characters.
+If you set nil, then don’t restrict by this variable.")
+
+(defvar auto-capitalize-inhibit-buffers '("*scratch*")
+  "Inhibit auto capitalize mode in those buffer.")
 
 ;; Internal variables:
 
 (defconst auto-capitalize-version "$Revision: 2.20 $"
   "This version of auto-capitalize.el")
 
-
 ;; Commands:
+
+(defun auto-capitalize-default-predicate-function ()
+  "Return t if condition is ok."
+  (and (not buffer-read-only)
+       ;; activate if prog and in string or comment.
+       (and (derived-mode-p 'prog-mode)
+            (save-excursion (nth 8 (syntax-ppss))))
+       ;; Inhibit specific buffers
+       (not (member (buffer-name) auto-capitalize-inhibit-buffers))
+       ;; activate after only specific characters you type
+       (or (null auto-capitalize-allowed-chars)
+           (member last-command-event auto-capitalize-allowed-chars))
+       ;; don’t turn on like inferior-XXX-mode
+       (not (derived-mode-p 'comint-mode))
+       ;; SKK (ddskk)
+       (or (not (bound-and-true-p skk-mode))
+           (and (bound-and-true-p skk-mode)
+                (fboundp 'skk-current-input-mode)
+                (eq 'latin (skk-current-input-mode))))))
 
 ;;;###autoload
 (easy-mmode-define-minor-mode auto-capitalize-mode
