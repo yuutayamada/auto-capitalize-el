@@ -1,4 +1,4 @@
-;;; auto-capitalize.el --- Automatically capitalize (or upcase) words
+;;; auto-capitalize.el --- Automatically capitalize (or upcase) words -*- lexical-binding: t; -*-
 
 ;; Copyright � 1998,2001,2002,2005 Kevin Rodgers
 
@@ -148,6 +148,8 @@ If you set nil, then don’t restrict by this variable.")
 (defconst auto-capitalize-version "$Revision: 2.20 $"
   "This version of auto-capitalize.el")
 
+(defvar auto-capitalize--match-data nil)
+
 ;; Commands:
 
 (defun auto-capitalize-default-predicate-function ()
@@ -279,6 +281,7 @@ This should be installed as an `after-change-function'."
                  (goto-char beg)
                  (save-match-data
                    (while (re-search-forward "\\Sw" end t)
+                     (setq auto-capitalize--match-data (match-data))
                      ;; recursion!
                      (let* ((this-command 'self-insert-command)
                             (non-word-char (char-after (match-beginning 0)))
@@ -286,17 +289,19 @@ This should be installed as an `after-change-function'."
                              (cond ((fboundp 'character-to-event) ; XEmacs
                                     (character-to-event non-word-char))
                                    (t non-word-char)))) ; GNU Emacs
+                       (set-match-data auto-capitalize--match-data)
                        (auto-capitalize (match-beginning 0)
                                         (match-end 0)
                                         0))))))))
     (error error)))
 
-(defun auto-capitalize-user-specified (lowercase-word match-beg match-end)
+
+
+(defun auto-capitalize-user-specified (lowercase-word m-beg m-end)
   "Capitalize user-specified capitalization"
   (if (not (member (setq lowercase-word
                          (buffer-substring ; -no-properties?
-                          (match-beginning 1)
-                          (match-end 1)))
+                          m-beg m-end))
                    auto-capitalize-words))
       ;; not preserving lower case
       (progn ; capitalize!
