@@ -132,12 +132,6 @@ see `\\[auto-capitalize-mode]', `\\[turn-on-capitalize-mode]', or
 (put 'auto-capitalize 'variable-interactive
      "XAutomatically capitalize the first word of each sentence? (t, nil, or 'query): ")
 
-(or (assq 'auto-capitalize minor-mode-alist)
-    (setq minor-mode-alist
-          (cons (list 'auto-capitalize " ACap")
-                minor-mode-alist)))
-
-
 (defvar auto-capitalize-yank nil
   "*If non-nil, the first word of yanked sentences are automatically capitalized.")
 
