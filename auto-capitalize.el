@@ -160,6 +160,7 @@ return nil if it’s failure.")
 (defun auto-capitalize-default-predicate-function ()
   "Return t if condition is ok."
   (and (not buffer-read-only)
+       (not (minibufferp))
        ;; activate if prog-mode and cursor is in string or comment.
        (if (derived-mode-p 'prog-mode)
            (and (derived-mode-p 'prog-mode)
