@@ -1,16 +1,24 @@
 ;;; auto-capitalize.el --- Automatically capitalize (or upcase) words -*- lexical-binding: t; -*-
 
-;; Copyright � 1998,2001,2002,2005 Kevin Rodgers
+;; Copyright   1998,2001,2002,2005 Kevin Rodgers
+
+;; This project was copied from emacswiki page
+;; (https://www.emacswiki.org/emacs/auto-capitalize.el) and I changed
+;; some details. Big difference is this package requires Emacs 24.3 or
+;; higher version.
 
 ;; Original Author: Kevin Rodgers <ihs_4664@yahoo.com>
+;; (Please don’t contact original author if you found a bug in this
+;; package)
 ;; Maintainer: Yuta Yamada <cokesboy at gmail.com>
+;; Package-Requires: ((emacs "24.3") (cl-lib "0.5"))
 
 ;; Created: 20 May 1998
 ;; Version: $Revision: 2.20 $
 ;; Package-Version: 2.20
 ;; Keywords: text, wp, convenience
 ;; RCS $Id: auto-capitalize.el,v 2.20 2005/05/25 18:47:22 kevinr Exp $
-;; URL: https://github.com/yuutayamada/auto-capitalize-el.git
+;; URL: https://github.com/yuutayamada/auto-capitalize-el
 
 ;; This program is free software; you can redistribute it and/or
 ;; modify it under the terms of the GNU General Public License as
@@ -76,6 +84,20 @@
 ;; ;; Use "_" instead of "." to define apostrophe as a symbol:
 ;; (modify-syntax-entry ?' ".   " text-mode-syntax-table) ; was "w   "
 
+;;; Some minor changes made by me (after I copied from emacswiki):
+;;
+;; 1 Apply Emacs 24.3 (due to ‘last-command-char’ -> ‘last-command-event’)
+;; 2 Add default predicate function.  It does:
+;;   * Only allow auto capitalization after specific character you
+;;     typed.  (see ‘auto-capitalize-allowed-chars’)
+;;   * Configurable on-and-off in specific buffers
+;;     (see ‘auto-capitalize-inhibit-buffers’)
+;;   * Work with prog-mode based major-mode.  Only turned on if the
+;;   * cursor is inside comment or string.
+;;   * Added some package specific predicates.
+;; 3 fixed some warnings.
+;; 4 use of lexical-biding.
+;;
 ;;; Code:
 
 ;; Rationale:
@@ -85,13 +107,13 @@
 ;; quirks in Emacs' implementation itself:
 ;;
 ;; One idea is to advise `self-insert-command' to `upcase'
-;; `last-command-char' before it is run, but command_loop_1 optimizes
+;; `last-command-event' before it is run, but command_loop_1 optimizes
 ;; out the call to the Lisp binding with its C binding
 ;; (Fself_insert_command), which prevents any advice from being run.
 ;;
 ;; Another idea is to use a before-change-function to `upcase'
-;; `last-command-char', but the change functions are called by
-;; internal_self_insert, which has already had `last-command-char'
+;; `last-command-event', but the change functions are called by
+;; internal_self_insert, which has already had `last-command-event'
 ;; passed to it as a C function parameter by command_loop_1.
 
 ;; Package interface:

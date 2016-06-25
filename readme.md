@@ -8,12 +8,11 @@ This package was forked from [emacswiki](http://www.emacswiki.org/emacs/auto-cap
 If you use el-get you can add recipe to el-get-source following code:
 
     (push '(:name auto-capitalize
-            :type git
-            :url "https://github.com/yuutayamada/auto-capitalize-el.git"
-            :load-path "./")
+            :type github
+            :pkgname "yuutayamada/auto-capitalize-el")
            el-get-sources)
 
-And then load this package after execute *M-x el-get-install RET auto-capitalize* 
+And then load this package after execute *M-x el-get-install RET auto-capitalize*
 
     (require 'auto-capitalize)
 
