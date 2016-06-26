@@ -419,12 +419,13 @@ The M-BEG and M-END are used to substring LOWERCASE-WORD."
        (and (eq auto-capitalize-state t)
             (if (not auto-capitalize-ask)
                 t
-              (prog1 (y-or-n-p
-                      (format "Capitalize \"%s\"? "
-                              (buffer-substring
-                               (match-beginning 0)
-                               (match-end 0))))
-                (message ""))))))
+              (auto-capitalize--ask)))))
+
+(defun auto-capitalize--ask ()
+  (prog1 (y-or-n-p
+          (format "Capitalize \"%s\"? "
+                  (buffer-substring (match-beginning 0) (match-end 0))))
+    (message "")))
 
 (defun auto-capitalize-capitalize-preceded-word ()
   "Capitalize preceded by a word character."
