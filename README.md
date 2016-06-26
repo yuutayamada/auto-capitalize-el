@@ -1,7 +1,20 @@
 # auto-capitalize.el
 
 Capitalize char automatically on Emacs.
-This package was forked from [emacswiki](http://www.emacswiki.org/emacs/auto-capitalize.el) to use [skk(ddskk)](http://openlab.ring.gr.jp/skk/ddskk.html).
+This package was forked from
+[emacswiki](http://www.emacswiki.org/emacs/auto-capitalize.el) for my
+daily use.
+
+Some improvements and changes are:
+
+- Recognize programming mode context. Only active auto-capitalize-mode
+  inside comment or string if the major-mode was derived from
+  `prog-mode`.
+- In org-mode, suppress auto-capitalize-mode inside src-block
+  (#+begin_src ...)
+- Only check after you typed certain characters. You can change this
+  behavior by `auto-capitalize-allowed-chars`.
+- Improve default predicate function.
 
 ### Installation
 
