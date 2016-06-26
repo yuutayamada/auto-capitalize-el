@@ -268,9 +268,9 @@ This sets `auto-capitalize' to nil."
 ;;;###autoload
 (defun enable-auto-capitalize-mode ()
   "Enable `auto-capitalize' mode in this buffer.
-This sets `auto-capitalize' to `query'."
+This sets `auto-capitalize-state' to t."
   (interactive)
-  (setq auto-capitalize-state 'query))
+  (setq auto-capitalize-ask t))
 
 ;; Internal functions:
 
