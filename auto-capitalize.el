@@ -375,24 +375,23 @@ The M-BEG and M-END are used to substring LOWERCASE-WORD."
                    t t)))
 
 (defun auto-capitalize-capitalizable-p (text-start word-start)
+  ""
+  (goto-char text-start)
   (and (or (equal text-start (point-min)) ; (bobp)
-           (progn ; beginning of paragraph?
-             (goto-char text-start)
-             (and (= (current-column) left-margin)
-                  (zerop (forward-line -1))
-                  (looking-at paragraph-separate)))
-           (progn ; beginning of paragraph?
-             (goto-char text-start)
-             (and (= (current-column) left-margin)
-                  (re-search-backward paragraph-start
-                                      nil t)
-                  (= (match-end 0) text-start)
-                  (= (current-column) left-margin)))
-           (progn ; beginning of sentence?
-             (goto-char text-start)
+           ;; beginning of paragraph?
+           (and (= (current-column) left-margin)
+                (or (save-excursion
+                      (and (zerop (forward-line -1))
+                           (looking-at paragraph-separate)))
+                    (save-excursion
+                      (and (re-search-backward paragraph-start
+                                               nil t)
+                           (= (match-end 0) text-start)
+                           (= (current-column) left-margin)))))
+           ;; beginning of sentence?
+           (save-excursion
              (save-restriction
-               (narrow-to-region (point-min)
-                                 word-start)
+               (narrow-to-region (point-min) word-start)
                (and (re-search-backward (auto-capitalize-sentence-end)
                                         nil t)
                     (= (match-end 0) text-start)
@@ -408,8 +407,7 @@ The M-BEG and M-END are used to substring LOWERCASE-WORD."
                       (goto-char
                        (1+ (match-beginning 0)))
                       (or (not
-                           (re-search-backward abbrev-regexp
-                                               nil t))
+                           (re-search-backward abbrev-regexp nil t))
                           (not
                            (member (match-string 0) auto-capitalize-words))))))))
        ;; inserting lowercase text?
