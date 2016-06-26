@@ -224,10 +224,10 @@ This sets `auto-capitalize' to t or nil (for this buffer) and ensures that
   (cond
    ((or (not auto-capitalize-mode) buffer-read-only)
     (setq-local auto-capitalize nil)
-    (remove-hook 'after-change-functions 'auto-capitalize t))
+    (remove-hook 'after-change-functions 'auto-capitalize-capitalize t))
    (t
     (setq-local auto-capitalize t)
-    (add-hook 'after-change-functions 'auto-capitalize nil t))))
+    (add-hook 'after-change-functions 'auto-capitalize-capitalize nil t))))
 
 ;;;###autoload
 (defun turn-on-auto-capitalize-mode ()
@@ -289,7 +289,7 @@ Fix known to work on 23.0.90 and later"
           (eq this-command 'newline-and-indent))
     (error error)))
 
-(defun auto-capitalize (beg end length)
+(defun auto-capitalize-capitalize (beg end length)
   "If `auto-capitalize' mode is on, then capitalize the previous word.
 The previous word is capitalized (or upcased) if it is a member of the
 `auto-capitalize-words' list; or if it begins a paragraph or sentence.
@@ -332,7 +332,7 @@ This should be installed as an `after-change-function'."
                                     (character-to-event non-word-char))
                                    (t non-word-char)))) ; GNU Emacs
                        (set-match-data auto-capitalize--match-data)
-                       (auto-capitalize (match-beginning 0)
+                       (auto-capitalize-capitalize (match-beginning 0)
                                         (match-end 0)
                                         0))))))))
     (error error)))
