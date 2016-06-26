@@ -283,6 +283,7 @@ Fix known to work on 23.0.90 and later"
     sentence-end))
 
 (defun auto-capitalize-condition (beg end length)
+  "Check condition."
   (condition-case error
       (or (and (or (eq this-command 'self-insert-command)
                    ;; LaTeX mode binds "." to TeX-insert-punctuation,
@@ -330,9 +331,9 @@ This should be installed as an `after-change-function'."
                      (funcall auto-capitalize-predicate)))
         (cond ((auto-capitalize-condition beg end length)
                ;; self-inserting, non-word character
-               (if (and (> beg (point-min))
-                        (equal (char-syntax (char-after (1- beg))) ?w))
-                   (auto-capitalize-capitalize-preceded-word)))
+               (when (and (> beg (point-min))
+                          (equal (char-syntax (char-after (1- beg))) ?w))
+                 (auto-capitalize-capitalize-preceded-word)))
               ((and auto-capitalize-yank
                     ;; `yank' sets `this-command' to t, and the
                     ;; after-change-functions are run before it has been
