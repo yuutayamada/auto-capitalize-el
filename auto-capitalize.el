@@ -151,7 +151,7 @@ modified.")
 In auto-capitalize mode, it is called with no arguments and should return a
 non-nil value if the current word is within \"normal\" text.")
 
-(defvar auto-capitalize-allowed-chars '(?\  ?, ?. ??)
+(defvar auto-capitalize-allowed-chars '(?\  ?, ?. ?? ?' ?’ ?: ?\; ?- ?!)
   "Whether auto capitalize after you typed those characters.
 If you set nil, then don't restrict by this variable.")
 
