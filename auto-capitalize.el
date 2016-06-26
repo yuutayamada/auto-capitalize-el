@@ -93,12 +93,17 @@
 ;;   * Configurable on-and-off in specific buffers
 ;;     (see ‘auto-capitalize-inhibit-buffers’)
 ;;   * Work with prog-mode based major-mode.  Only turned on if the
-;;   * cursor is inside comment or string.
+;;     cursor is inside comment or string.
 ;;   * Added some package specific predicates.
 ;; 3 fixed some warnings.
 ;; 4 use of lexical-biding.
 ;; 5 use capitalized words of aspell’s dictionary
 ;;   (see ‘auto-capitalize-aspell-file’)
+;;
+;; Note that I only used this package in Ubuntu and only Emacs (not
+;; XEmacs). So I might be wrongly changed something because original
+;; version had some XEmacs specific conditions.  (Pull Requests are
+;; welcome)
 ;;
 ;;; Code:
 
@@ -178,6 +183,7 @@ The file name would be something like .aspell.en.pws.")
 
 (defvar auto-capitalize--match-data nil)
 
+;; Maybe this regex has to be changed in XEmacs
 (defvar auto-capitalize-regex-lower "[[:lower:]]+")
 (defvar auto-capitalize-regex-verify
   "\\<\\([[:upper:]]?[[:lower:]]+\\.\\)+\\=")
@@ -214,7 +220,7 @@ The file name would be something like .aspell.en.pws.")
 With optional prefix ARG, turn `auto-capitalize' mode on iff ARG is positive.
 This sets `auto-capitalize' to t or nil (for this buffer) and ensures that
 `auto-capitalize' is installed in `after-change-functions' (for all buffers)."
-  nil " C" nil
+  nil " ACap" nil
   (cond
    ((or (not auto-capitalize-mode) buffer-read-only)
     (setq-local auto-capitalize nil)
@@ -243,7 +249,6 @@ This sets `auto-capitalize' to nil."
 This sets `auto-capitalize' to `query'."
   (interactive)
   (setq auto-capitalize 'query))
-
 
 ;; Internal functions:
 
@@ -331,8 +336,6 @@ This should be installed as an `after-change-function'."
                                         (match-end 0)
                                         0))))))))
     (error error)))
-
-
 
 (defun auto-capitalize-user-specified (lowercase-word m-beg m-end)
   "Capitalize user-specified capitalization"
@@ -472,7 +475,6 @@ This should be installed as an `after-change-function'."
 
 ;;;###autoload
 (defun auto-capitalize-setup ()
-  ""
   (auto-capitalize-merge-aspell-words)
   (add-hook 'after-change-major-mode-hook 'auto-capitalize-mode))
 
