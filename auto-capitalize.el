@@ -127,45 +127,68 @@
 
 (require 'cl-lib) ; cl-find, cl-minusp
 
+(defgroup auto-capitalize nil "auto-capitalize customization group"
+  :group 'convenience)
+
 ;; User options:
 
+(defcustom auto-capitalize-ask nil
+  "*If non-nil, ask before capitalize."
+  :group 'auto-capitalize
+  :type 'boolean)
 
-(defvar auto-capitalize-yank nil
-  "*If non-nil, the first word of yanked sentences are automatically capitalized.")
-
-(put 'auto-capitalize-yank 'variable-interactive
-     "XAutomatically capitalize the first word of yanked sentences? (t or nil): ")
-
+(defcustom auto-capitalize-yank nil
+  "*If non-nil, the first word of yanked sentences are automatically capitalized."
+  :group 'auto-capitalize
+  :type 'boolean)
 
 ;; User variables:
 
-(defvar auto-capitalize-words '("I");  "Stallman" "GNU" "http"
+(defcustom auto-capitalize-words '("I");  "Stallman" "GNU" "http"
   "If non-nil, a list of proper nouns or acronyms.
 If `auto-capitalize' mode is on, these words will be automatically
 capitalized or upcased as listed (mixed case is allowable as well), even
 in the middle of a sentence.  A lowercase word will not have its case
-modified.")
+modified."
+  :group 'auto-capitalize
+  :type '(repeat (string :tag "Word list")))
 
-(defvar auto-capitalize-predicate 'auto-capitalize-default-predicate-function
+(defcustom auto-capitalize-predicate 'auto-capitalize-default-predicate-function
   "If non-nil, a function that determines whether to enable capitalization.
 In auto-capitalize mode, it is called with no arguments and should return a
-non-nil value if the current word is within \"normal\" text.")
+non-nil value if the current word is within \"normal\" text."
+  :group 'auto-capitalize
+  :type '(choise (function :tag "Predicate function")
+                 (const nil)))
 
-(defvar auto-capitalize-allowed-chars '(?\  ?, ?. ?? ?' ?’ ?: ?\; ?- ?!)
+(defcustom auto-capitalize-allowed-chars '(?\  ?, ?. ?? ?' ?’ ?: ?\; ?- ?!)
   "Whether auto capitalize after you typed those characters.
-If you set nil, then don't restrict by this variable.")
+If you set nil, then don't restrict by this variable."
+  :group 'auto-capitalize
+  :type '(choise (repeat (character :tag "Characters to start"))
+                 (const nil)))
 
-(defvar auto-capitalize-inhibit-buffers '("*scratch*")
-  "Inhibit auto capitalize mode in those buffer.")
+(defcustom auto-capitalize-inhibit-buffers '("*scratch*")
+  "Inhibit auto capitalize mode in those buffer."
+  :group 'auto-capitalize
+  :type '(repeat (string :tag "Word list")))
 
-(defvar auto-capitalize-predicate-functions nil
+(defcustom auto-capitalize-predicate-functions nil
   "This hook is used to call predicate functions.
 The function should return t if the predicate is ok or
-return nil if it's failure.")
+return nil if it's failure."
+  :group 'auto-capitalize
+  :type '(choise
+          (repeat (function :tag "Predicate functions"))
+          (const nil)))
 
-(defvar auto-capitalize-aspell-file nil
+(defcustom auto-capitalize-aspell-file nil
   "You can set a file path of aspell to use capitalized words of aspell.
-The file name would be something like .aspell.en.pws.")
+The file name would be something like .aspell.en.pws."
+  :group 'auto-capitalize
+  :type '(choise
+          (const nil)
+          (file)))
 
 ;; Internal variables:
 
@@ -405,13 +428,15 @@ This should be installed as an `after-change-function'."
        (let ((case-fold-search nil))
          (goto-char word-start)
          (looking-at auto-capitalize-regex-lower))
-       (or (eq auto-capitalize-state t)
-           (prog1 (y-or-n-p
-                   (format "Capitalize \"%s\"? "
-                           (buffer-substring
-                            (match-beginning 0)
-                            (match-end 0))))
-             (message "")))))
+       (and (eq auto-capitalize-state t)
+            (if (not auto-capitalize-ask)
+                t
+              (prog1 (y-or-n-p
+                      (format "Capitalize \"%s\"? "
+                              (buffer-substring
+                               (match-beginning 0)
+                               (match-end 0))))
+                (message ""))))))
 
 (defun auto-capitalize-capitalize-preceded-word ()
   "Capitalize preceded by a word character."
