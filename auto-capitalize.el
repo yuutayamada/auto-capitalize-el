@@ -285,8 +285,7 @@ Fix known to work on 23.0.90 and later"
                                                  nil nil t))
                             (t last-command-event)))) ; GNU Emacs
                  (not (equal (char-syntax self-insert-char) ?w))))
-          (eq this-command 'newline)
-          (eq this-command 'newline-and-indent))
+          (memq this-command '(newline newline-and-indent)))
     (error error)))
 
 (defun auto-capitalize-capitalize (beg end length)
