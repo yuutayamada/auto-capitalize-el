@@ -16,8 +16,24 @@ And then load this package after execute *M-x el-get-install RET auto-capitalize
 
     (require 'auto-capitalize)
 
-### Configuration Example
+### Configuration Examples
+
 
 ```lisp
+(setq auto-capitalize-words `("I" "English"))
 (add-hook 'after-change-major-mode-hook 'auto-capitalize-mode)
 ```
+
+or
+
+
+```
+;; This configuration adds capitalized words of .aspell.en.pws
+;; (aspell's user dictionary)
+(require 'auto-capitalize)
+(setq auto-capitalize-words `("I" "English"))
+(setq auto-capitalize-aspell-file "path/to/.aspell.en.pws")
+(auto-capitalize-setup)
+
+```
+
