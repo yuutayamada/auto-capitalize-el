@@ -444,12 +444,7 @@ The M-BEG and M-END are used to substring LOWERCASE-WORD."
     (forward-word -1)
     (save-match-data
       (let* ((word-start (point))
-             (text-start
-              (progn
-                (while (or (cl-minusp (skip-chars-backward "\""))
-                           (cl-minusp (skip-syntax-backward "\"(")))
-                  t)
-                (point)))
+             (text-start (auto-capitalize--backward))
              lowercase-word)
         (cond ((and auto-capitalize-words
                     (let ((case-fold-search nil))
@@ -468,6 +463,13 @@ The M-BEG and M-END are used to substring LOWERCASE-WORD."
                (undo-boundary)
                (goto-char word-start)
                (capitalize-word 1)))))))
+
+(defun auto-capitalize--backward ()
+  "Return point of text start."
+  (while (or (cl-minusp (skip-chars-backward "\""))
+             (cl-minusp (skip-syntax-backward "\"(")))
+    t)
+  (point))
 
 (defun auto-capitalize--get-buffer-string (file)
   "Get buffer string from FILE."
