@@ -302,13 +302,12 @@ Fix known to work on 23.0.90 and later"
                      ;; XEmacs `lookup-key' signals "unable to bind
                      ;; this type of event" for commands invoked via
                      ;; the mouse:
-                     (and (if (and (vectorp key)
-                                   (> (length key) 0)
-                                   (fboundp 'misc-user-event-p)
-                                   (misc-user-event-p (aref key 0)))
-                              nil
-                            (eq (lookup-key global-map key t)
-                                'self-insert-command))
+                     (and (not (and (vectorp key)
+                                    (> (length key) 0)
+                                    (fboundp 'misc-user-event-p)
+                                    (misc-user-event-p (aref key 0))))
+                          (eq (lookup-key global-map key t)
+                              'self-insert-command)
                           ;; single character insertion?
                           (= length 0)
                           (= (- end beg) 1))))
