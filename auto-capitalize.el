@@ -401,16 +401,11 @@ The M-BEG and M-END are used to substring LOWERCASE-WORD."
                     (let ((previous-char
                            (char-after
                             (1- text-start))))
-                      ;; In some modes, newline
-                      ;; (^J, aka LFD) is comment-
-                      ;; end, not whitespace:
-                      (or (equal previous-char
-                                 ?\n)
-                          (equal (char-syntax
-                                  previous-char)
-                                 ? )))
-                    ;; verify: not preceded by
-                    ;; an abbreviation?
+                      ;; In some modes, newline (^J, aka LFD) is comment-end,
+                      ;; not whitespace:
+                      (or (eq ?\n previous-char)
+                          (eq ?\  (char-syntax previous-char))))
+                    ;; verify: not preceded by an abbreviation?
                     (let ((case-fold-search nil)
                           (abbrev-regexp auto-capitalize-regex-verify))
                       (goto-char
