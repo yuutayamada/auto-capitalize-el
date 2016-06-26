@@ -396,11 +396,8 @@ The M-BEG and M-END are used to substring LOWERCASE-WORD."
                (and (re-search-backward (auto-capitalize-sentence-end)
                                         nil t)
                     (= (match-end 0) text-start)
-                    ;; verify: preceded by
-                    ;; whitespace?
-                    (let ((previous-char
-                           (char-after
-                            (1- text-start))))
+                    ;; verify: preceded by whitespace?
+                    (let ((previous-char (char-before text-start)))
                       ;; In some modes, newline (^J, aka LFD) is comment-end,
                       ;; not whitespace:
                       (or (eq ?\n previous-char)
