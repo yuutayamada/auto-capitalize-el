@@ -359,10 +359,10 @@ This should be installed as an `after-change-function'."
     (error error)))
 
 (defun auto-capitalize-user-specified (lowercase-word m-beg m-end)
-  "Capitalize user-specified capitalization"
+  "Find LOWERCASE-WORD and capitalize it.
+The M-BEG and M-END are used to substring LOWERCASE-WORD."
   (when (not (member (setq lowercase-word
-                           (buffer-substring ; -no-properties?
-                            m-beg m-end))
+                           (buffer-substring m-beg m-end))
                      auto-capitalize-words))
     ;; not preserving lower case
     ;; capitalize!
