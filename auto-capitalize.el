@@ -197,8 +197,6 @@ see `\\[auto-capitalize-mode]', `\\[turn-on-capitalize-mode]', or
            (and (derived-mode-p 'prog-mode)
                 (save-excursion (nth 8 (syntax-ppss))))
          t)
-       ;; inhibit specific buffers
-       (not (member (buffer-name) auto-capitalize-inhibit-buffers))
        ;; activate after only specific characters you type
        (or (null auto-capitalize-allowed-chars)
            (member last-command-event auto-capitalize-allowed-chars))
@@ -220,9 +218,12 @@ This sets `auto-capitalize' to t or nil (for this buffer) and ensures that
 `auto-capitalize' is installed in `after-change-functions' (for all buffers)."
   nil " ACap" nil
   (cond
-   ((or (not auto-capitalize-mode) buffer-read-only)
+   ;; Turn off
+   ((or (not auto-capitalize-mode) buffer-read-only
+        (member (buffer-name) auto-capitalize-inhibit-buffers))
     (setq-local auto-capitalize-state nil)
     (remove-hook 'after-change-functions 'auto-capitalize-capitalize t))
+   ;; Turn on
    (t
     (setq-local auto-capitalize-state t)
     (add-hook 'after-change-functions 'auto-capitalize-capitalize nil t))))
