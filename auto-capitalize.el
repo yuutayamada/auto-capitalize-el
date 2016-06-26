@@ -360,18 +360,18 @@ This should be installed as an `after-change-function'."
 
 (defun auto-capitalize-user-specified (lowercase-word m-beg m-end)
   "Capitalize user-specified capitalization"
-  (if (not (member (setq lowercase-word
-                         (buffer-substring ; -no-properties?
-                          m-beg m-end))
-                   auto-capitalize-words))
-      ;; not preserving lower case
-      (progn ; capitalize!
-        (undo-boundary)
-        (replace-match (cl-find lowercase-word
-                                auto-capitalize-words
-                                :key 'downcase
-                                :test 'string-equal)
-                       t t))))
+  (when (not (member (setq lowercase-word
+                           (buffer-substring ; -no-properties?
+                            m-beg m-end))
+                     auto-capitalize-words))
+    ;; not preserving lower case
+    ;; capitalize!
+    (undo-boundary)
+    (replace-match (cl-find lowercase-word
+                            auto-capitalize-words
+                            :key 'downcase
+                            :test 'string-equal)
+                   t t)))
 
 (defun auto-capitalize-capitalizable-p (text-start word-start)
   (and (or (equal text-start (point-min)) ; (bobp)
