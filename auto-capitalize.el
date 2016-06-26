@@ -129,15 +129,6 @@
 
 ;; User options:
 
-(defvar-local auto-capitalize-state nil
-  "If non-nil, the first word of a sentence is automatically capitalized.
-If non-nil but not t, query the user before capitalizing a word.
-This variable automatically becomes buffer-local when set in any fashion\;
-see `\\[auto-capitalize-mode]', `\\[turn-on-capitalize-mode]', or
-`\\[enable-auto-capitalize-mode]'.")
-
-(put 'auto-capitalize 'variable-interactive
-     "XAutomatically capitalize the first word of each sentence? (t, nil, or 'query): ")
 
 (defvar auto-capitalize-yank nil
   "*If non-nil, the first word of yanked sentences are automatically capitalized.")
@@ -180,6 +171,13 @@ The file name would be something like .aspell.en.pws.")
 
 (defconst auto-capitalize-version "$Revision: 2.20 $"
   "This version of auto-capitalize.el.")
+
+(defvar-local auto-capitalize-state nil
+  "If non-nil, the first word of a sentence is automatically capitalized.
+If non-nil but not t, query the user before capitalizing a word.
+This variable automatically becomes buffer-local when set in any fashion\;
+see `\\[auto-capitalize-mode]', `\\[turn-on-capitalize-mode]', or
+`\\[enable-auto-capitalize-mode]'.")
 
 (defvar auto-capitalize--match-data nil)
 
