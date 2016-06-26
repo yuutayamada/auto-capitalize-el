@@ -168,7 +168,7 @@ If you set nil, then don't restrict by this variable.")
   "Inhibit auto capitalize mode in those buffer.")
 
 (defvar auto-capitalize-predicate-functions nil
-  "This hook is used to call predicate function.
+  "This hook is used to call predicate functions.
 The function should return t if the predicate is ok or
 return nil if it's failure.")
 
@@ -179,7 +179,7 @@ The file name would be something like .aspell.en.pws.")
 ;; Internal variables:
 
 (defconst auto-capitalize-version "$Revision: 2.20 $"
-  "This version of auto-capitalize.el")
+  "This version of auto-capitalize.el.")
 
 (defvar auto-capitalize--match-data nil)
 
@@ -416,7 +416,7 @@ This should be installed as an `after-change-function'."
              (message "")))))
 
 (defun auto-capitalize-capitalize-preceded-word ()
-  "Capitalize preceded by a word character"
+  "Capitalize preceded by a word character."
   (save-excursion
     (forward-word -1)
     (save-match-data
@@ -447,6 +447,7 @@ This should be installed as an `after-change-function'."
                (capitalize-word 1)))))))
 
 (defun auto-capitalize--get-buffer-string (file)
+  "Get buffer string from FILE."
   (let* ((current        (current-buffer))
          (aspell-buffer  (find-file-noselect file))
          words)
@@ -456,7 +457,7 @@ This should be installed as an `after-change-function'."
     words))
 
 (defun auto-capitalize--get-aspell-capital-words (file)
-  ""
+  "Return list of words from FILE."
   (if (file-exists-p file)
       (cl-loop with personal-dict = (auto-capitalize--get-buffer-string file)
                with words = (split-string personal-dict "\n")
@@ -467,6 +468,7 @@ This should be installed as an `after-change-function'."
     (error (format "The file %s doesn't exist" file))))
 
 (defun auto-capitalize-merge-aspell-words (&optional file)
+  "Extract words from FILE and merge ti to ‘auto-capitalize-words’."
   (let ((f (or auto-capitalize-aspell-file file)))
     (when (file-exists-p f)
       (setq auto-capitalize-words
@@ -475,6 +477,7 @@ This should be installed as an `after-change-function'."
 
 ;;;###autoload
 (defun auto-capitalize-setup ()
+  "Setup auto-capitalize."
   (auto-capitalize-merge-aspell-words)
   (add-hook 'after-change-major-mode-hook 'auto-capitalize-mode))
 
