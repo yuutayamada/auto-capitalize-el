@@ -129,7 +129,7 @@
 
 ;; User options:
 
-(defvar-local auto-capitalize nil
+(defvar-local auto-capitalize-state nil
   "If non-nil, the first word of a sentence is automatically capitalized.
 If non-nil but not t, query the user before capitalizing a word.
 This variable automatically becomes buffer-local when set in any fashion\;
@@ -223,10 +223,10 @@ This sets `auto-capitalize' to t or nil (for this buffer) and ensures that
   nil " ACap" nil
   (cond
    ((or (not auto-capitalize-mode) buffer-read-only)
-    (setq-local auto-capitalize nil)
+    (setq-local auto-capitalize-state nil)
     (remove-hook 'after-change-functions 'auto-capitalize-capitalize t))
    (t
-    (setq-local auto-capitalize t)
+    (setq-local auto-capitalize-state t)
     (add-hook 'after-change-functions 'auto-capitalize-capitalize nil t))))
 
 ;;;###autoload
@@ -248,7 +248,7 @@ This sets `auto-capitalize' to nil."
   "Enable `auto-capitalize' mode in this buffer.
 This sets `auto-capitalize' to `query'."
   (interactive)
-  (setq auto-capitalize 'query))
+  (setq auto-capitalize-state 'query))
 
 ;; Internal functions:
 
@@ -304,7 +304,7 @@ Capitalization can be disabled in specific contexts via the
 
 This should be installed as an `after-change-function'."
   (condition-case error
-      (when (and auto-capitalize
+      (when (and auto-capitalize-state
                  (or (null auto-capitalize-predicate)
                      (funcall auto-capitalize-predicate)))
         (cond ((auto-capitalize-condition beg end length)
@@ -407,7 +407,7 @@ This should be installed as an `after-change-function'."
        (let ((case-fold-search nil))
          (goto-char word-start)
          (looking-at auto-capitalize-regex-lower))
-       (or (eq auto-capitalize t)
+       (or (eq auto-capitalize-state t)
            (prog1 (y-or-n-p
                    (format "Capitalize \"%s\"? "
                            (buffer-substring
