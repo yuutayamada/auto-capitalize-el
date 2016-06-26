@@ -419,12 +419,7 @@ The M-BEG and M-END are used to substring LOWERCASE-WORD."
                            (re-search-backward abbrev-regexp
                                                nil t))
                           (not
-                           (member
-                            (buffer-substring ; -no-properties?
-                             (match-beginning 0)
-                             (match-end 0))
-                            auto-capitalize-words))))
-                    ))))
+                           (member (match-string 0) auto-capitalize-words))))))))
        ;; inserting lowercase text?
        (let ((case-fold-search nil))
          (goto-char word-start)
